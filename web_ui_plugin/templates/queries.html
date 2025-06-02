@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Queries - Vinted Notifications{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Recherches</h1>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-plus-circle me-2 text-info"></i>
+                <h5 class="card-title mb-0">Ajouter une nouvelle Recherche</h5>
+            </div>
+            <div class="card-body">
+                <form action="/add_query" method="post">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label for="query">URL Vinted ou requête de recherche</label>
+                                <input type="text" class="form-control" id="query" name="query"
+                                       placeholder="https://www.vinted.fr/catalog?search_text=nike+dunk" required>
+                                <small class="form-text text-muted">Entrez une URL de recherche Vinted ou un terme de recherche</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center">
+                            <button type="submit" class="btn btn-primary w-100">Ajouter la Recherche</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-search me-2 text-info"></i>
+                <h5 class="card-title mb-0">Recherches Actuelles</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Recherche</th>
+                            <th>Dernier Arcticle trouvé</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for query in queries %}
+                        <tr>
+                            <td>{{ query.id }}</td>
+                            <td>{{ query.display }}</td>
+                            <td>{{ query.last_found_item }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="/items?query={{ query.query|urlencode }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-box"></i> Voir les articles
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal{{ query.id }}">
+                                        <i class="bi bi-trash"></i> Enlever
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ query.id }}" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel{{ query.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ query.id }}">Confirmer
+                                                    la Suppression</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Êtes-vous sûr de vouloir supprimer la recherche : <strong>{{ query.display
+                                                }}</strong> ?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Annuler
+                                                </button>
+                                                <form action="/remove_query/{{ query.id }}" method="post"
+                                                      class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Aucune recherche trouvée</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if queries %}
+            <div class="card-footer">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                    <i class="bi bi-trash"></i> Supprimer toutes les recherches
+                </button>
+
+                <!-- Delete All Modal -->
+                <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteAllModalLabel">Confirmer la suppression</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Êtes-vous sûr de vouloir supprimer <strong>TOUTES</strong> les Recherches ? Cette action n'as pas de retour 
+                                en arrière.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <form action="/remove_query/all" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-danger">Tout Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

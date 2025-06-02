@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Allowlist - Vinted Notifications{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Liste des Pays autorisés</h1>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-plus-circle me-2 text-info"></i>
+                <h5 class="card-title mb-0">Ajouter un pays</h5>
+            </div>
+            <div class="card-body">
+                <form action="/add_country" method="post">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label for="country">Code pays (2 lettres)</label>
+                                <input type="text" class="form-control" id="country" name="country" placeholder="FR"
+                                       maxlength="2" required>
+                                <small class="form-text text-muted">Entrez un code pays à 2 lettres (par exemple, FR pour la France, DE pour l’Allemagne, etc..)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center">
+                            <button type="submit" class="btn btn-primary w-100">Ajouter le Pays</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-globe me-2 text-info"></i>
+                <h5 class="card-title mb-0">Liste des Pays Actuellement autorisés</h5>
+            </div>
+            <div class="card-body">
+                {% if countries %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Code du pays</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for country in countries %}
+                        <tr>
+                            <td>{{ country }}</td>
+                            <td>
+                                <form action="/remove_country/{{ country }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Enlever
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#clearAllowlistModal">
+                        <i class="bi bi-trash"></i> Supprimer la liste des Pays en cours 
+                    </button>
+
+                    <!-- Clear Allowlist Modal -->
+                    <div class="modal fade" id="clearAllowlistModal" tabindex="-1"
+                         aria-labelledby="clearAllowlistModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="clearAllowlistModalLabel">Confirmer la Suppression de la Liste Actuel</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir effacer toute la liste des Pays autorisés actuellement ? Cela autorisera les articles de tous les pays.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler
+                                    </button>
+                                    <form action="/clear_allowlist" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger">Tout Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info show">
+                    <i class="bi bi-info-circle"></i> Aucun pays dans la liste autorisée. Les articles de tous les pays seront affichés.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-info-circle me-2 text-info"></i>
+                <h5 class="card-title mb-0">À propos de la liste des Pays autorisés</h5>
+            </div>
+            <div class="card-body">
+                <p>La liste d’autorisation des pays vous permet de filtrer les articles en fonction du pays du vendeur. 
+                    Uniquement les articles des vendeurs dans les pays autorisés seront affichés</p>
+                <p>Si la liste d’autorisation est vide, les articles de tous les pays seront affichés.</p>
+                <p>Les codes de pays sont des codes ISO à 2 lettres, tels que :</p>
+                <ul>
+                    <li><strong>FR</strong> - France</li>
+                    <li><strong>DE</strong> - Allemagne</li>
+                    <li><strong>ES</strong> - Espagne</li>
+                    <li><strong>IT</strong> - Italie</li>
+                    <li><strong>UK</strong> - Royaume-Uni</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
