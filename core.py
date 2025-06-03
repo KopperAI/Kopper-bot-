@@ -6,6 +6,9 @@ from logger import get_logger
 # Get logger for this module
 logger = get_logger(__name__)
 
+# Proxy Tor SOCKS5 défini dans configuration_values.py
+PROXIES = configuration_values.PROXIES
+
 def process_query(query):
     """
     Process a Vinted query URL by:
@@ -171,13 +174,13 @@ def get_user_country(profile_id):
     """
     # Users are shared between all Vinted platforms, so we can use whatever locale we want
     url = f"https://www.vinted.fr/api/v2/users/{profile_id}?localize=false"
-    response = requester.get(url)
+    response = requester.get(url, proxies=PROXIES)
     # That's a LOT of requests, so if we get a 429 we wait a bit before retrying once
     if response.status_code == 429:
         # In case of rate limit, we're switching the endpoint. This one is slower, but it doesn't RL as soon. 
         # We're limiting the items per page to 1 to grab as little data as possible
         url = f"https://www.vinted.fr/api/v2/users/{profile_id}/items?page=1&per_page=1"
-        response = requester.get(url)
+        response = requester.get(url, proxies=PROXIES)
         try:
             user_country = response.json()["items"][0]["user"]["country_iso_code"]
         except KeyError:
@@ -264,7 +267,7 @@ def check_version():
         ver = db.get_parameter("version")
         # Get latest version from the repository
         url = f"{github_url}/releases/latest"
-        response = requests.get(url)
+        response = requests.get(url, proxies=PROXIES)
 
         if response.status_code == 200:
             latest_version = response.url.split('/')[-1]
